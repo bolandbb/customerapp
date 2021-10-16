@@ -1,0 +1,133 @@
+---
+title: "Pricing_Exercise"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Cleaning Data
+
+
+```{r}
+
+# Clear All Variables & Clear the Screen
+rm(list=ls())
+cat("\014")
+
+# Packages
+my_packages <- c('readxl', 'readr', 'tidyr', 'dplyr', 'lfe', 'janitor', 'lubridate', 'pscl', 'plyr')
+lapply(my_packages, require, character.only = T)
+
+# Read in the Data
+data.ex2 = read.csv("Ex2_Data_R.csv")
+
+# Explore the data
+str(data.ex2)
+summary(data.ex2)
+
+```
+## PREPARE DATA
+ 
+ 
+##Logs for App 1
+```{r}
+
+# Create log UNITS
+data.ex2$logUNITS1 <- log(data.ex2$UNITS1)
+
+# Create log PRICES
+data.ex2$logPRICE1 <- log(data.ex2$REGPR1)
+
+
+plot(data.ex2$logUNITS1, data.ex2$REGPR1)
+plot(data.ex2$UNITS1, data.ex2$logPRICE1)
+```
+
+##Logs for App 2
+```{r}
+
+# Create log UNITS
+data.ex2$logUNITS2 <- log(data.ex2$UNITS2)
+
+# Create log PRICES
+data.ex2$logPRICE2 <- log(data.ex2$REGPR2)
+```
+
+##Logs for App 3
+```{r}
+
+# Create log UNITS
+data.ex2$logUNITS3 <- log(data.ex2$UNITS3)
+
+# Create log PRICES
+data.ex2$logPRICE3 <- log(data.ex2$REGPR3)
+```
+
+## App 1 Regression
+
+###linear multiple regression model is the best
+
+```{r}
+
+# Run the Regression (includes an INTERCEPT)
+lr.model.price <- lm(UNITS1 ~ REGPR1, data = data.ex2)
+semi.log.price <- lm(logUNITS1~REGPR1, data=data.ex2)
+log.log.price <- lm(logUNITS1~logPRICE1, data = data.ex2)
+
+# Display Results
+summary(lr.model.price)
+summary(semi.log.price)
+summary(log.log.price)
+
+#linear multiple regression model is the best
+ml.price <- lm(UNITS1 ~ REGPR1+FEAT1+RATING1, data = data.ex2)
+summary(ml.price)
+
+ml.semilog.price <- lm(logUNITS1 ~ REGPR1 + FEAT1 +RATING1, data = data.ex2)
+summary(ml.semilog.price)
+```
+
+
+## App 2 Regression
+
+```{r}
+
+# Run the Linear Multiple Regression 
+ml.price.2 <- lm(UNITS2 ~ REGPR2+FEAT2+RATING2, data = data.ex2)
+
+# Display Results
+summary(ml.price.2)
+```
+
+## App 3 Linear Regression is still stronger
+```{r}
+
+# Run the Regression 
+ml.price.3 <- lm(UNITS3 ~ REGPR3+FEAT3+RATING3, data = data.ex2)
+
+# Display Results
+summary(ml.price.3)
+
+```
+### use multiple variable linear regression model to include competitor units sold
+ 
+```{r}
+# App 1
+ml.competitive.1 <- lm(UNITS1~REGPR1 + FEAT1 + RATING1 + UNITS2 + UNITS3, data = data.ex2)
+summary(ml.competitive.1)
+
+# App 2
+ml.competitive.2 <- lm(UNITS2~REGPR2 + FEAT2 + RATING2 + UNITS1 + UNITS3, data = data.ex2)
+summary(ml.competitive.2)
+
+# App 3
+ml.competitive.3 <- lm(UNITS2~REGPR2 + FEAT2 + RATING2 + UNITS1 + UNITS3, data = data.ex2)
+summary(ml.competitive.3)
+
+
+```
+
+
